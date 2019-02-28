@@ -1,0 +1,29 @@
+# dependencies
+app/node_modules
+app/.npm
+
+# testing
+/coverage
+
+# production
+app/build
+app/build_prod
+
+# misc
+.DS_Store
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.bash_history
+
+# IDE
+/.idea
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+
+#mysql files
+database/mysql

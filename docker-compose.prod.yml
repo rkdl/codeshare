@@ -1,0 +1,46 @@
+version: "2"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - 5000
+    command: [
+      "uwsgi",
+      "--http", "0.0.0.0:5000",
+      "--wsgi-file", "runserver.py",
+      "--callable", "app",
+      "--catch-exceptions",
+      "--processes", "1"
+    ]
+    volumes:
+      - ./backend/backend:/app/backend
+
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_ROOT_PASSWORD: 'passwd'
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./database/mysql:/var/lib/mysql
+    restart: always
+
+  nginx:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    links:
+      - backend
+    ports:
+      - 443:443
+    volumes:
+      - ./nginx/certs:/etc/nginx/ssl
+      - ./nginx/conf.d.prod:/etc/nginx/conf.d

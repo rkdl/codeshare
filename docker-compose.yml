@@ -1,0 +1,66 @@
+version: "2"
+
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    restart: always
+    command: ["yarn", "start"]
+    expose:
+      - 3000
+    volumes:
+      - ./app/public:/app/public
+      - ./app/build:/app/build
+      - ./app/src:/app/src
+    links:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    expose:
+      - 5000
+    command: [
+      "uwsgi",
+      "--http", "0.0.0.0:5000",
+      "--wsgi-file", "runserver.py",
+      "--callable", "app",
+      "--catch-exceptions",
+      "--processes", "1",
+      "--py-autoreload", "3"
+    ]
+    environment:
+      - "CONFIG=Debug"
+    volumes:
+      - ./backend/backend:/app/backend
+    links:
+      - database
+
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_ROOT_PASSWORD: 'passwd'
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./database/mysql:/var/lib/mysql
+    restart: always
+
+  nginx:
+    image: nginx:1.13.9-alpine
+    restart: always
+    command: ["nginx", "-g", "daemon off;"]
+    links:
+      - backend
+      - app
+    ports:
+      - 1488:80
+    volumes:
+      - ./nginx/conf.d.dev:/etc/nginx/conf.d
