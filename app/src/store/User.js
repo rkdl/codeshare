@@ -20,22 +20,18 @@ function UserContextProvider(props){
 
     setUserObject(user);
 
-    const serviceRaw = user.providerData[0].providerId;
-    const service = serviceRaw.substring(0, serviceRaw.length - 4);
-    const identifier = user.email;
+    const {providerId, uid} = user.providerData[0];
+    const service = providerId.substring(0, providerId.length - 4);
 
-    if (!identifier){
-      // TODO: choose the right identifier
-      throw new Error(
-        'Email is empty for this user. please try another method'
-      );
+    if (!uid){
+      throw new Error('uid is empty. login failed');
     }
 
     const {
       data: { userId } 
     } = await loginUserAPI({
       service,
-      identifier
+      identifier: uid
     });
 
     setUserId(userId);

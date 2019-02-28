@@ -27,9 +27,6 @@ function App(props){
           <div>
             {userContext.user.displayName}
           </div>
-          <div>
-            {userContext.user.email}
-          </div>
           <button
             onClick={handleLogoutButtonClick}
           >
