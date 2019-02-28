@@ -3,10 +3,12 @@ import ReactDOM from 'react-dom';
 import Bootstrap from './Bootstrap';
 import UserContextProvider from './store/User';
 import * as serviceWorker from './serviceWorker';
+import { CssBaseline } from '@material-ui/core';
 
 ReactDOM.render(
   (
     <UserContextProvider>
+      <CssBaseline />
       <Bootstrap />
     </UserContextProvider>
   ), 
