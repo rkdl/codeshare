@@ -1,29 +1,15 @@
 import React from 'react';
-// import firebase from 'firebase/app';
-// import {UserContext} from './store/User';
 import { 
   Router, 
   Route, 
 } from 'react-router';
 import {createBrowserHistory} from 'history';
 import MainScreen from './components/screens/Main';
+import {
+  withStyles
+} from '@material-ui/core';
 
 const history = createBrowserHistory();
-
-// const handleGoogleLoginButtonClick = async () => {
-//   const provider = new firebase.auth.GoogleAuthProvider();
-//   provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
-//   await firebase.auth().signInWithPopup(provider);
-// };
-
-// const handleFacebookLoginButtonClick = async () => {
-//   const provider = new firebase.auth.FacebookAuthProvider();
-//   await firebase.auth().signInWithPopup(provider);
-// };
-
-// const handleLogoutButtonClick = () => {
-//   firebase.auth().signOut();
-// };
 
 function App(props){
   return (
@@ -33,4 +19,10 @@ function App(props){
   );
 }
 
-export default App;
+const styles = theme => ({
+  '@global': {
+    fontFamily: 'Roboto, sans- serif',
+  },
+});
+
+export default withStyles(styles)(App);
