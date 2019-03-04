@@ -64,8 +64,8 @@ function Account(props) {
           variant="outlined" 
           className={classes.button}
           onClick={
-            () => {  
-              setIsOpen(false); 
+            () => {
+              setIsOpen(false);
               handleFacebookLoginButtonClick();
             }
           }
@@ -86,10 +86,7 @@ function Account(props) {
         </Button>
       </Dialog>
       <div className={classes.root}>
-        <Typography 
-          color="inherit"
-          className={classes.name}
-        >
+        <Typography color="inherit">
           {
             isLoggedIn && (
               userContext.user.displayName
@@ -131,9 +128,6 @@ const styles = theme => ({
   },
   button: {
     marginBottom: theme.spacing.unit,
-  },
-  name: {
-    marginRight: theme.spacing.unit,
   },
 });
 

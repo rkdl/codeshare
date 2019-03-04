@@ -6,7 +6,6 @@ import {
   withStyles, 
 } from '@material-ui/core';
 import Account from '../Account';
-import Logo from '../Logo';
 
 function Header(props) {
   const {
@@ -20,12 +19,11 @@ function Header(props) {
     >
       <Toolbar className={classes.toolbar}>
         <div className={classes.logoContainer}>
-          <Logo className={classes.logo}/>
           <Typography 
             className={classes.logoText}
             color="inherit"
           >
-            Editor
+            CodeShare
           </Typography>
         </div>
         <Account />
@@ -41,7 +39,6 @@ const styles = theme => ({
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
-    background: '#20232a',
   },
   logoContainer: {
     display: 'flex',
@@ -52,7 +49,7 @@ const styles = theme => ({
   },
   logoText: {
     fontWeight: 800,
-    color: '#61dafb',
+    color: 'white',
     fontSize: 20,
     lineHeight: '20px',
   },

@@ -7,11 +7,11 @@ import {
   CssBaseline, 
   MuiThemeProvider 
 } from '@material-ui/core';
-import theme from './theme';
+import {darkTheme} from './theme';
 
 ReactDOM.render(
   (
-    <MuiThemeProvider theme={theme}>
+    <MuiThemeProvider theme={darkTheme}>
       <UserContextProvider>
         <CssBaseline />
         <Bootstrap />

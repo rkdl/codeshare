@@ -11,7 +11,7 @@ import {
 
 const history = createBrowserHistory();
 
-function App(props){
+function App() {
   return (
     <Router history={history}>
       <Route path="/" component={MainScreen}/>
@@ -21,7 +21,7 @@ function App(props){
 
 const styles = theme => ({
   '@global': {
-    fontFamily: 'Roboto, sans- serif',
+    fontFamily: 'Roboto, sans-serif',
   },
 });
 
