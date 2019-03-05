@@ -3,13 +3,21 @@ import ReactDOM from 'react-dom';
 import Bootstrap from './Bootstrap';
 import UserContextProvider from './store/User';
 import * as serviceWorker from './serviceWorker';
+import { 
+  CssBaseline, 
+  MuiThemeProvider 
+} from '@material-ui/core';
+import {darkTheme} from './theme';
 
 ReactDOM.render(
   (
-    <UserContextProvider>
-      <Bootstrap />
-    </UserContextProvider>
-  ), 
+    <MuiThemeProvider theme={darkTheme}>
+      <UserContextProvider>
+        <CssBaseline />
+        <Bootstrap />
+      </UserContextProvider>
+    </MuiThemeProvider>
+  ),
   document.getElementById('root')
 );
 

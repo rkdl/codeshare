@@ -12,8 +12,10 @@ import {UserContext} from './store/User';
 
 firebase.initializeApp(FIREBASE_CONFIG);
 
-function Bootstrap(props){
-  const { classes } = props;
+function Bootstrap(props) {
+  const { 
+    classes,
+  } = props;
   
   const userContext = React.useContext(UserContext);
 

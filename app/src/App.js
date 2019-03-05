@@ -1,54 +1,28 @@
 import React from 'react';
-import firebase from 'firebase/app';
-import {UserContext} from './store/User';
+import { 
+  Router, 
+  Route, 
+} from 'react-router';
+import {createBrowserHistory} from 'history';
+import MainScreen from './components/screens/Main';
+import {
+  withStyles
+} from '@material-ui/core';
 
-const handleGoogleLoginButtonClick = async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
-  await firebase.auth().signInWithPopup(provider);
-};
+const history = createBrowserHistory();
 
-const handleFacebookLoginButtonClick = async () => {
-  const provider = new firebase.auth.FacebookAuthProvider();
-  await firebase.auth().signInWithPopup(provider);
-};
-
-const handleLogoutButtonClick = () => {
-  firebase.auth().signOut();
-};
-
-function App(props){
-  const userContext = React.useContext(UserContext);
-
+function App() {
   return (
-    userContext.user 
-      ? (
-        <>
-          <div>
-            {userContext.user.displayName}
-          </div>
-          <button
-            onClick={handleLogoutButtonClick}
-          >
-            LOGOUT
-          </button>
-        </>
-      )
-      : (
-        <>
-          <button
-            onClick={handleGoogleLoginButtonClick}
-          >
-            LOGIN WITH GOOGLE
-          </button>
-          <button
-            onClick={handleFacebookLoginButtonClick}
-          >
-            LOGIN WITH FACEBOOK
-          </button>
-        </>
-      )
+    <Router history={history}>
+      <Route path="/" component={MainScreen}/>
+    </Router>
   );
 }
 
-export default App;
+const styles = theme => ({
+  '@global': {
+    fontFamily: 'Roboto, sans-serif',
+  },
+});
+
+export default withStyles(styles)(App);

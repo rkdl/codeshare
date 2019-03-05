@@ -12,7 +12,7 @@ const loginUserAPI = async params => {
   }).then(resp => resp.json());
 };
 
-function UserContextProvider(props){
+function UserContextProvider(props) {
   const [userObject, setUserObject] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
 
