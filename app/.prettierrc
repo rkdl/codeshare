@@ -1,0 +1,7 @@
+{
+  "singleQuote": true,
+  "bracketSpacing": false,
+  "eslintIntegration": true,
+  "tslintIntegration": true,
+  "trailingComma": "es5"
+}

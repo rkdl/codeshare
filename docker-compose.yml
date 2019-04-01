@@ -1,12 +1,13 @@
-version: "2"
+version: '2'
 
 services:
   app:
     build:
       context: ./app
       dockerfile: Dockerfile
+    container_name: app
     restart: always
-    command: ["yarn", "start"]
+    command: ['yarn', 'start']
     expose:
       - 3000
     volumes:
@@ -20,20 +21,21 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: backend
     restart: always
     expose:
       - 5000
     command: [
-      "uwsgi",
-      "--http", "0.0.0.0:5000",
-      "--wsgi-file", "runserver.py",
-      "--callable", "app",
-      "--catch-exceptions",
-      "--processes", "1",
-      "--py-autoreload", "3"
+      'uwsgi',
+      '--http', '0.0.0.0:5000',
+      '--wsgi-file', 'runserver.py',
+      '--callable', 'app',
+      '--catch-exceptions',
+      '--processes', '1',
+      '--py-autoreload', '3'
     ]
     environment:
-      - "CONFIG=Debug"
+      - 'CONFIG=Debug'
     volumes:
       - ./backend/backend:/app/backend
     links:
@@ -43,20 +45,19 @@ services:
     build:
       context: ./database
       dockerfile: Dockerfile
-    container_name: mysql
+    container_name: mongo
     environment:
-      MYSQL_DATABASE: 'db'
-      MYSQL_ROOT_PASSWORD: 'passwd'
-    ports:
-      - '3306:3306'
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
     volumes:
-      - ./database/mysql:/var/lib/mysql
-    restart: always
+      - ./database/db:/data/db
+    command: mongod --smallfiles --logpath=/dev/null
 
   nginx:
     image: nginx:1.13.9-alpine
     restart: always
-    command: ["nginx", "-g", "daemon off;"]
+    command: ['nginx', '-g', 'daemon off;']
+    container_name: nginx
     links:
       - backend
       - app

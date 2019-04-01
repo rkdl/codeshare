@@ -1,28 +1,15 @@
 import React from 'react';
-import {
-  AppBar, 
-  Toolbar,
-  Typography,
-  withStyles, 
-} from '@material-ui/core';
+import {AppBar, Toolbar, Typography, withStyles} from '@material-ui/core';
 import Account from '../Account';
 
 function Header(props) {
-  const {
-    classes
-  } = props;
+  const {classes} = props;
 
   return (
-    <AppBar 
-      position="static"
-      className={classes.root}
-    >
+    <AppBar position="static" className={classes.root}>
       <Toolbar className={classes.toolbar}>
         <div className={classes.logoContainer}>
-          <Typography 
-            className={classes.logoText}
-            color="inherit"
-          >
+          <Typography className={classes.logoText} color="inherit">
             CodeShare
           </Typography>
         </div>

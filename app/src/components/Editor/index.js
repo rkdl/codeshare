@@ -9,32 +9,23 @@ import {
 import Highlight from 'react-highlight';
 
 const MIN_LINES_OF_CODE = 10;
-const SUPPORTED_LANGUAGES = [
-  'Javascript',
-  'PHP',
-  'Python'
-];
+const SUPPORTED_LANGUAGES = ['Javascript', 'PHP', 'Python'];
 
 function Editor(props) {
-  const {
-    classes,
-    className,
-    theme
-  } = props;
+  const {classes, className, theme} = props;
 
-  if (theme.palette.type === 'dark'){
+  if (theme.palette.type === 'dark') {
     require('highlight.js/styles/vs2015.css');
   } else {
     require('highlight.js/styles/vs.css');
   }
-  
+
   const [value, setValue] = React.useState('');
   const [language, setLanguage] = React.useState('javascript');
 
   const linesOfCode = [...value].reduce(
-    (count, char) => (
-      char === '\n' ? count + 1 : count
-    ), 1
+    (count, char) => (char === '\n' ? count + 1 : count),
+    1
   );
 
   const count = Math.max(linesOfCode, MIN_LINES_OF_CODE);
@@ -44,52 +35,32 @@ function Editor(props) {
       <div className={classes.optionsContainer}>
         <Select
           value={language}
-          onChange={
-            ({target}) => setLanguage(target.value)
-          }
+          onChange={({target}) => setLanguage(target.value)}
         >
-          {
-            SUPPORTED_LANGUAGES.map(
-              language => (
-                <MenuItem
-                  key={language}
-                  value={language.toLowerCase()}
-                >
-                  {language}
-                </MenuItem>
-              )
-            )
-          }
+          {SUPPORTED_LANGUAGES.map(language => (
+            <MenuItem key={language} value={language.toLowerCase()}>
+              {language}
+            </MenuItem>
+          ))}
         </Select>
       </div>
       <div className={classes.editorContainer}>
         <div>
-          {
-            [...Array(count).keys()].map(
-              value => (
-                <Typography
-                  key={value}
-                  className={classes.countNumber}
-                >
-                  {value + 1}
-                </Typography>
-              )
-            )
-          }
+          {[...Array(count).keys()].map(value => (
+            <Typography key={value} className={classes.countNumber}>
+              {value + 1}
+            </Typography>
+          ))}
         </div>
         <div className={classes.codeContainer}>
           <textarea
             className={classes.input}
             rows={count}
-            onChange={
-              ({target}) => setValue(target.value)
-            }
+            onChange={({target}) => setValue(target.value)}
             value={value}
           />
           <div className={classes.output}>
-            <Highlight className={language}>
-              {value}
-            </Highlight>
+            <Highlight className={language}>{value}</Highlight>
           </div>
         </div>
       </div>
@@ -105,15 +76,14 @@ const styles = theme => ({
   root: {
     padding: theme.spacing.unit * 2,
     color: theme.palette.text.primary,
-    background: theme.palette.type === 'dark' 
-      ? '#1E1E1E'
-      : theme.palette.common.white,
+    background:
+      theme.palette.type === 'dark' ? '#1E1E1E' : theme.palette.common.white,
   },
   countNumber: {
     display: 'block',
     height: 19,
-    width: 60, 
-    textAlign: 'right', 
+    width: 60,
+    textAlign: 'right',
     paddingRight: theme.spacing.unit * 2,
     fontFamily: FONT_FAMILY,
     userSelect: 'none',
@@ -163,11 +133,11 @@ const styles = theme => ({
     padding: theme.spacing.unit,
   },
   '@global': {
-    'pre': {
+    pre: {
       margin: 0,
       padding: 0,
     },
-    'code': {
+    code: {
       margin: '0 !important',
       padding: '0 !important',
       fontFamily: FONT_FAMILY,

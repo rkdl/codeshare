@@ -7,4 +7,4 @@ users = Blueprint(
     url_prefix='/api/users'
 )
 
-from . import views
+from . import views  # noqa: F401,E402

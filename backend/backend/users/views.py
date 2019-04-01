@@ -1,35 +1,44 @@
 from flask import request, jsonify
-
-from backend.database import db
 from backend.users import users
 from backend.users.models import Users
+from backend.helpers import (
+    OK_RESPONSE,
+    ERROR_RESPONSE
+)
+from backend.users.helpers import (
+    verify_firebase_id_token,
+    set_cookie_access_token
+)
 
 
 @users.route('/login', methods=['POST'])
-def create():
+def login():
     request_params = request.get_json(force=True)
+
     service = request_params.get('service')
     identifier = request_params.get('identifier')
+    id_token = request_params.get('idToken')
 
     if not service or not identifier:
-      return jsonify({
-        'type': 'ERROR',
-        'errorType': 'MISSING_REQUIRED_PARAMS'
-      })
+        return ERROR_RESPONSE(errorType='MISSING_REQUIRED_PARAMS')
 
-    user_model = Users.query.filter_by(
-      login_service=service,
-      login_identifier=identifier
-    ).first()
+    id_token_information = verify_firebase_id_token(id_token)
+    if not id_token_information or \
+            id_token_information['firebase']['identities'][service][0] != identifier:
+        return ERROR_RESPONSE(errorType='ACCESS_DENIED')
 
-    if not user_model:
-      user_model = Users.create(service, identifier)
-      db.session.flush()
+    user_document = Users.get_by_service_and_identifier(
+        service,
+        identifier
+    )
 
-    db.session.commit()
-    return jsonify({
-      'type': 'OK',
-      'data': {
-        'userId': user_model.user_id
-      }
-    })
+    if not user_document:
+        user_document = Users.create(service, identifier)
+
+    user_id = str(user_document['_id'])
+    access_token = user_document['access_token']
+
+    return set_cookie_access_token(
+        OK_RESPONSE(data={'userId': user_id}),
+        access_token
+    )

@@ -44,9 +44,7 @@ function Account(props) {
     }
   };
 
-  const {
-    classes,
-  } = props;
+  const {classes} = props;
 
   return (
     <>
@@ -57,59 +55,35 @@ function Account(props) {
           paper: classes.dialogPaper,
         }}
       >
-        <DialogTitle>
-          Select Login Service
-        </DialogTitle>
-        <Button 
-          variant="outlined" 
+        <DialogTitle>Select Login Service</DialogTitle>
+        <Button
+          variant="outlined"
           className={classes.button}
-          onClick={
-            () => {
-              setIsOpen(false);
-              handleFacebookLoginButtonClick();
-            }
-          }
+          onClick={() => {
+            setIsOpen(false);
+            handleFacebookLoginButtonClick();
+          }}
         >
           Facebook
         </Button>
         <Button
-          variant="outlined" 
+          variant="outlined"
           className={classes.button}
-          onClick={
-            () => {
-              setIsOpen(false);
-              handleGoogleLoginButtonClick();
-            }
-          }
+          onClick={() => {
+            setIsOpen(false);
+            handleGoogleLoginButtonClick();
+          }}
         >
           Google
         </Button>
       </Dialog>
       <div className={classes.root}>
         <Typography color="inherit">
-          {
-            isLoggedIn && (
-              userContext.user.displayName
-            )
-          }
+          {isLoggedIn && userContext.user.displayName}
         </Typography>
-        <Tooltip 
-          title={
-            isLoggedIn
-              ? 'Log out' 
-              : 'Log in'
-          }
-        >
-          <IconButton 
-            color="inherit"
-            onClick={handleButtonClick}
-          >
-            {
-              isLoggedIn
-                ? <ExitToAppIcon />
-                : <AccountCircleIcon /> 
-            }
-            
+        <Tooltip title={isLoggedIn ? 'Log out' : 'Log in'}>
+          <IconButton color="inherit" onClick={handleButtonClick}>
+            {isLoggedIn ? <ExitToAppIcon /> : <AccountCircleIcon />}
           </IconButton>
         </Tooltip>
       </div>

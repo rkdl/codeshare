@@ -1,6 +1,4 @@
-import { 
-  createMuiTheme, 
-} from '@material-ui/core';
+import {createMuiTheme} from '@material-ui/core';
 
 export const lightTheme = createMuiTheme({
   typography: {
@@ -11,10 +9,10 @@ export const lightTheme = createMuiTheme({
 
 export const darkTheme = createMuiTheme({
   palette: {
-    type: 'dark'
+    type: 'dark',
   },
   typography: {
     fontFamily: 'Roboto, sans-serif',
     useNextVariants: true,
   },
-})
+});

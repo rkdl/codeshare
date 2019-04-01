@@ -5,15 +5,16 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: backend
     expose:
       - 5000
     command: [
-      "uwsgi",
-      "--http", "0.0.0.0:5000",
-      "--wsgi-file", "runserver.py",
-      "--callable", "app",
-      "--catch-exceptions",
-      "--processes", "1"
+      'uwsgi',
+      '--http", "0.0.0.0:5000',
+      '--wsgi-file", 'runserver.py',
+      '--callable', 'app',
+      '--catch-exceptions',
+      '--processes', '1'
     ]
     volumes:
       - ./backend/backend:/app/backend
@@ -22,20 +23,19 @@ services:
     build:
       context: ./database
       dockerfile: Dockerfile
-    container_name: mysql
+    container_name: mongo
     environment:
-      MYSQL_DATABASE: 'db'
-      MYSQL_ROOT_PASSWORD: 'passwd'
-    ports:
-      - '3306:3306'
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
     volumes:
-      - ./database/mysql:/var/lib/mysql
-    restart: always
+      - ./database/db:/data/db
+    command: mongod --smallfiles --logpath=/dev/null
 
   nginx:
     build:
       context: ./
       dockerfile: Dockerfile
+    container_name: nginx
     restart: always
     links:
       - backend

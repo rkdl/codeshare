@@ -1,16 +1,10 @@
-MYSQL_USERNAME = 'root'
-MYSQL_PASSWORD = 'passwd'
-
-
 class DebugConfig(object):
     DEBUG = True
     SECRET_KEY = 'secret_key'
 
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@database:3306/db?charset=utf8'.format(
-        username=MYSQL_USERNAME,
-        password=MYSQL_PASSWORD,
-    )
+    PYMONGO_DATABASE_URI = 'mongodb://database:27017'
+    FIREBASE_CREDENTIALS = \
+        'config/code-editor-f5df0-firebase-adminsdk-byomg-953cd56e88.json'
 
 
 class ProdConfig(DebugConfig):

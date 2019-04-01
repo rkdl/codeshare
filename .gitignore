@@ -25,5 +25,5 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-#mysql files
-database/mysql
+#database dump files
+database/db

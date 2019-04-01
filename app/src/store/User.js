@@ -7,7 +7,7 @@ const loginUserAPI = async params => {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
-      'Content-type': 'application/json'
+      'Content-type': 'application/json',
     },
   }).then(resp => resp.json());
 };
@@ -17,21 +17,21 @@ function UserContextProvider(props) {
   const [userId, setUserId] = React.useState(null);
 
   const setUser = async user => {
-
     setUserObject(user);
 
     const {providerId, uid} = user.providerData[0];
-    const service = providerId.substring(0, providerId.length - 4);
+    const idToken = await user.getIdToken();
 
-    if (!uid){
-      throw new Error('uid is empty. login failed');
+    if (!uid || !idToken || !providerId) {
+      throw new Error('failed to fetch some data from firebase');
     }
 
     const {
-      data: { userId } 
+      data: {userId},
     } = await loginUserAPI({
-      service,
-      identifier: uid
+      service: providerId,
+      identifier: uid,
+      idToken,
     });
 
     setUserId(userId);
@@ -53,11 +53,9 @@ function UserContextProvider(props) {
     >
       {props.children}
     </UserContext.Provider>
-  )
+  );
 }
 
-export {
-  UserContext
-}
+export {UserContext};
 
 export default UserContextProvider;
