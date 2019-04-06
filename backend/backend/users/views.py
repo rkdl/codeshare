@@ -1,5 +1,6 @@
 from flask import request
 
+from backend.services.database import mongo
 from backend.users import users
 from backend.users.models import Users
 from backend.helpers import (
@@ -32,7 +33,11 @@ def login():
     )
 
     if not user_document:
-        user_document = Users.create(service, identifier)
+        result = Users.create(service, identifier)
+        inserted_id = result.inserted_id
+        user_document = mongo.db[Users.collection_name].find_one({
+            '_id': inserted_id
+        })
 
     user_id = str(user_document['_id'])
     access_token = user_document['access_token']

@@ -1,7 +1,7 @@
 from flask import Flask
 
 from backend.services import firebase
-from backend.services.database import db
+from backend.services.database import mongo
 from backend.settings import get_config
 
 # blueprints
@@ -12,7 +12,7 @@ def create_app() -> Flask:
     app = Flask(__name__)
     conf = get_config()
     app.config.from_object(conf)
-    db.init_app(app)
+    mongo.init_app(app)
     firebase.init_app(app)
     app.register_blueprint(users)
     return app
