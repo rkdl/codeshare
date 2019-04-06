@@ -1,15 +1,15 @@
 from flask import jsonify
 
 
-def OK_RESPONSE(*args, **kwargs):
+def jsonify_ok(data):
     return jsonify({
         'status': 'OK',
-        'data': kwargs['data']
+        'data': data,
     })
 
 
-def ERROR_RESPONSE(*args, **kwargs):
+def jsonify_error(*, error_type):
     return jsonify({
         'status': 'ERROR',
-        'errorType': kwargs['errorType']
+        'errorType': error_type,
     })
