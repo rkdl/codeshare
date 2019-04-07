@@ -1,5 +1,8 @@
 FROM python:3.6.6
 
+ENV PYTHONUNBUFFERED 1
+ENV TZ Europe/Kiev
+
 RUN apt-get update && \
     apt-get -y install\
     gcc \
@@ -9,8 +12,10 @@ RUN apt-get update && \
 WORKDIR /app
 ENV HOME /app
 
-COPY requirements.txt requirements.txt
 COPY config config
-RUN pip install -r requirements.txt
+COPY Pipfile Pipfile.lock ./
+
+RUN pip install pipenv
+RUN pipenv install --system --deploy
 
 COPY runserver.py runserver.py
