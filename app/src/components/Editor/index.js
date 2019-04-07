@@ -1,15 +1,19 @@
 import React from 'react';
 import {
   Card,
+  FormControlLabel,
   withStyles,
   Select,
   MenuItem,
+  Switch,
   Typography,
 } from '@material-ui/core';
 import Highlight from 'react-highlight';
 
+import {SUPPORTED_LANGUAGES, determineLanguage} from '../../lib/highlighting';
+import {debounce} from "../../lib/utils";
+
 const MIN_LINES_OF_CODE = 10;
-const SUPPORTED_LANGUAGES = ['Javascript', 'PHP', 'Python'];
 
 function Editor(props) {
   const {classes, className, theme} = props;
@@ -22,11 +26,30 @@ function Editor(props) {
 
   const [value, setValue] = React.useState('');
   const [language, setLanguage] = React.useState('javascript');
+  const [
+    isLangDetectionEnabled,
+    setIsLangDetectionEnabled,
+  ] = React.useState(true);
 
   const linesOfCode = [...value].reduce(
     (count, char) => (char === '\n' ? count + 1 : count),
     1
   );
+
+  const handleLangAutodetect = debounce(() => {
+    if (!isLangDetectionEnabled) {
+      return;
+    }
+    const supposedLanguage = determineLanguage(value);
+    if (supposedLanguage) {
+      setLanguage(supposedLanguage);
+    }
+  }, linesOfCode < 25 ? 500 : 1000);
+
+  const handleValueChange = ({target}) => {
+    setValue(target.value);
+    handleLangAutodetect();
+  };
 
   const count = Math.max(linesOfCode, MIN_LINES_OF_CODE);
 
@@ -35,7 +58,10 @@ function Editor(props) {
       <div className={classes.optionsContainer}>
         <Select
           value={language}
-          onChange={({target}) => setLanguage(target.value)}
+          onChange={({target}) => {
+            setLanguage(target.value);
+            setIsLangDetectionEnabled(false);
+          }}
         >
           {SUPPORTED_LANGUAGES.map(language => (
             <MenuItem key={language} value={language.toLowerCase()}>
@@ -43,6 +69,19 @@ function Editor(props) {
             </MenuItem>
           ))}
         </Select>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isLangDetectionEnabled}
+              onChange={
+                () => setIsLangDetectionEnabled(!isLangDetectionEnabled)
+              }
+              color="primary"
+              value="checkedAutodetect"
+            />
+          }
+          label="As-you-type detection"
+        />
       </div>
       <div className={classes.editorContainer}>
         <div>
@@ -56,7 +95,7 @@ function Editor(props) {
           <textarea
             className={classes.input}
             rows={count}
-            onChange={({target}) => setValue(target.value)}
+            onChange={handleValueChange}
             value={value}
           />
           <div className={classes.output}>
