@@ -11,7 +11,7 @@ import {
 import Highlight from 'react-highlight';
 
 import {SUPPORTED_LANGUAGES, determineLanguage} from '../../lib/highlighting';
-import {debounce} from "../../lib/utils";
+import {debounce} from '../../lib/utils';
 
 const MIN_LINES_OF_CODE = 10;
 
