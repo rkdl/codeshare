@@ -2,26 +2,19 @@ import {highlightAuto} from 'highlight.js';
 
 const SUPPORTED_LANGUAGES_RAW = [
   '1c',
-  'bash',
   'c',
   'cpp',
   'cs',
   'css',
   'go',
-  'haskell',
   'java',
   'javascript',
-  'kotlin',
-  'lisp',
   'perl',
   'php',
   'python',
   'ruby',
-  'rust',
   'scala',
   'shell',
-  'xml',
-  'yaml',
 ];
 
 const LANG_ALIASES_MAP = {
