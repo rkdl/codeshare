@@ -5,6 +5,11 @@ import UserContextProvider from './store/User';
 import * as serviceWorker from './serviceWorker';
 import {CssBaseline, MuiThemeProvider} from '@material-ui/core';
 import {darkTheme} from './theme';
+import hljs from 'highlight.js';
+import {SUPPORTED_LANGUAGES_RAW} from './lib/highlighting';
+
+hljs.configure({languages: SUPPORTED_LANGUAGES_RAW});
+
 
 ReactDOM.render(
   <MuiThemeProvider theme={darkTheme}>
