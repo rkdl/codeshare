@@ -37,8 +37,7 @@ def login():
         inserted_id = result.inserted_id
         user_document = Users.get_by_mongo_id(inserted_id)
 
-    user_id = str(user_document['_id'])
     access_token = user_document['access_token']
 
-    response = jsonify_ok(data={'userId': user_id})
+    response = jsonify_ok(data={'identifier': identifier})
     return set_cookie_access_token(response, access_token)

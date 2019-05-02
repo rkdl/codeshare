@@ -89,9 +89,7 @@ def update():
         text_document
     )
 
-    return jsonify_ok(
-        data=prepare_text_document_structure(text_document)
-    )
+    return jsonify_ok(data=None)
 
 
 @texts.route('/delete', methods=['POST'])
@@ -114,4 +112,4 @@ def delete():
 
     Texts.delete({'identifier': identifier})
 
-    return jsonify_ok(data={'identifier': identifier})
+    return jsonify_ok(data=None)

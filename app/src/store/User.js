@@ -14,7 +14,7 @@ const loginUserAPI = async params => {
 
 function UserContextProvider(props) {
   const [userObject, setUserObject] = React.useState(null);
-  const [userId, setUserId] = React.useState(null);
+  const [identifier, setIdentifier] = React.useState(null);
 
   const setUser = async user => {
     setUserObject(user);
@@ -26,26 +26,23 @@ function UserContextProvider(props) {
       throw new Error('failed to fetch some data from firebase');
     }
 
-    const {
-      data: {userId},
-    } = await loginUserAPI({
+    setIdentifier(String(uid));
+    await loginUserAPI({
       service: providerId,
       identifier: uid,
       idToken,
     });
-
-    setUserId(userId);
   };
 
   const resetUser = () => {
     setUserObject(null);
-    setUserId(null);
+    setIdentifier(null);
   };
 
   return (
     <UserContext.Provider
       value={{
-        userId,
+        identifier,
         user: userObject,
         setUser,
         resetUser,
