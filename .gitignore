@@ -19,6 +19,7 @@ yarn-error.log*
 
 # IDE
 /.idea
+.vscode
 
 # python
 __pycache__/

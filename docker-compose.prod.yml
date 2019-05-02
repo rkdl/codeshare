@@ -16,6 +16,8 @@ services:
       '--catch-exceptions',
       '--processes', '1'
     ]
+    environment:
+      - 'CONFIG=Prod'
     volumes:
       - ./backend/backend:/app/backend
 

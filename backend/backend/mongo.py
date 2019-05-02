@@ -1,10 +1,10 @@
 from pymongo import MongoClient
-from pymongo.database import Database
+from pymongo.database import Database as _Database
 
 
-class ClientMaker:
+class Database:
     client: MongoClient
-    db: Database
+    db: _Database
 
     def init_app(self, app):
         client = MongoClient(app.config['PYMONGO_DATABASE_URI'], connect=False)
@@ -13,4 +13,4 @@ class ClientMaker:
         self.db = client.db
 
 
-mongo = ClientMaker()
+mongo = Database()

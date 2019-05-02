@@ -1,18 +1,25 @@
 from flask import Flask
+from warnings import filterwarnings
 
-from backend.services import firebase
-from backend.services.database import mongo
 from backend.settings import get_config
 
-# blueprints
+from backend import firebase
+from backend.mongo import mongo
 from backend.users import users
+from backend.texts import texts
+
+filterwarnings('ignore')
 
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    conf = get_config()
-    app.config.from_object(conf)
-    mongo.init_app(app)
+
+    app_config = get_config()
+    app.config.from_object(app_config)
+
     firebase.init_app(app)
+    mongo.init_app(app)
     app.register_blueprint(users)
+    app.register_blueprint(texts)
+
     return app

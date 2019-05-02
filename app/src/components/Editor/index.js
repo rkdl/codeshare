@@ -1,22 +1,14 @@
 import React from 'react';
-import {
-  Card,
-  FormControlLabel,
-  withStyles,
-  Select,
-  MenuItem,
-  Switch,
-  Typography,
-} from '@material-ui/core';
+import {Card, withStyles, Typography} from '@material-ui/core';
 import Highlight from 'react-highlight';
-
-import {SUPPORTED_LANGUAGES, determineLanguage} from '../../lib/highlighting';
-import {debounce} from '../../lib/utils';
+import {CodeContext} from '../../store/Code';
 
 const MIN_LINES_OF_CODE = 10;
 
 function Editor(props) {
   const {classes, className, theme} = props;
+
+  const codeContext = React.useContext(CodeContext);
 
   if (theme.palette.type === 'dark') {
     require('highlight.js/styles/vs2015.css');
@@ -24,65 +16,16 @@ function Editor(props) {
     require('highlight.js/styles/vs.css');
   }
 
-  const [value, setValue] = React.useState('');
-  const [language, setLanguage] = React.useState('javascript');
-  const [
-    isLangDetectionEnabled,
-    setIsLangDetectionEnabled,
-  ] = React.useState(true);
-
-  const linesOfCode = [...value].reduce(
-    (count, char) => (char === '\n' ? count + 1 : count),
-    1
-  );
-
-  const handleLangAutodetect = debounce(() => {
-    if (!isLangDetectionEnabled) {
-      return;
+  const handleValueChange = event => {
+    if (props.edit) {
+      codeContext.setText(event.target.value);
     }
-    const supposedLanguage = determineLanguage(value);
-    if (supposedLanguage) {
-      setLanguage(supposedLanguage);
-    }
-  }, linesOfCode < 25 ? 500 : 1000);
-
-  const handleValueChange = ({target}) => {
-    setValue(target.value);
-    handleLangAutodetect();
   };
 
-  const count = Math.max(linesOfCode, MIN_LINES_OF_CODE);
+  const count = Math.max(codeContext.textLinesCount, MIN_LINES_OF_CODE);
 
   return (
     <Card className={`${classes.root} ${className}`}>
-      <div className={classes.optionsContainer}>
-        <Select
-          value={language}
-          onChange={({target}) => {
-            setLanguage(target.value);
-            setIsLangDetectionEnabled(false);
-          }}
-        >
-          {SUPPORTED_LANGUAGES.map(language => (
-            <MenuItem key={language} value={language.toLowerCase()}>
-              {language}
-            </MenuItem>
-          ))}
-        </Select>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isLangDetectionEnabled}
-              onChange={
-                () => setIsLangDetectionEnabled(!isLangDetectionEnabled)
-              }
-              color="primary"
-              value="checkedAutodetect"
-            />
-          }
-          label="As-you-type detection"
-        />
-      </div>
       <div className={classes.editorContainer}>
         <div>
           {[...Array(count).keys()].map(value => (
@@ -93,13 +36,17 @@ function Editor(props) {
         </div>
         <div className={classes.codeContainer}>
           <textarea
-            className={classes.input}
+            className={`${classes.input} ${
+              props.edit ? '' : classes.inputDisabled
+            }`}
             rows={count}
             onChange={handleValueChange}
-            value={value}
+            value={codeContext.text}
           />
           <div className={classes.output}>
-            <Highlight className={language}>{value}</Highlight>
+            <Highlight className={codeContext.language}>
+              {codeContext.text}
+            </Highlight>
           </div>
         </div>
       </div>
@@ -158,6 +105,11 @@ const styles = theme => ({
     fontFamily: FONT_FAMILY,
     fontSize: FONT_SIZE,
     lineHeight: LINE_HEIGHT,
+    whiteSpace: 'pre',
+    overflowX: 'hidden',
+  },
+  inputDisabled: {
+    display: 'none',
   },
   output: {
     whiteSpace: 'pre',
@@ -167,9 +119,7 @@ const styles = theme => ({
     right: 0,
     bottom: 0,
     zIndex: 0,
-  },
-  optionsContainer: {
-    padding: theme.spacing.unit,
+    overflowX: 'hidden',
   },
   '@global': {
     pre: {

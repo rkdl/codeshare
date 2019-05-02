@@ -5,7 +5,7 @@ from firebase_admin.auth import AuthError, verify_id_token
 ACCESS_TOKEN_EXPIRE_COOKIE_TIME_DAYS = 365
 
 
-def is_auth_allowed(service: str, identifier: str, id_token: str) -> bool:
+def validate_user_information(service: str, identifier: str, id_token: str) -> bool:
     try:
         id_token_information = verify_id_token(id_token)
     except (AuthError, ValueError):

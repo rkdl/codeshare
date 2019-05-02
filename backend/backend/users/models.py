@@ -1,10 +1,7 @@
 from hashlib import sha1
 
-from backend.services.database import mongo
-
-
-def get_sha1_hash(value: str) -> str:
-    return sha1(value.encode()).hexdigest()
+from backend.mongo import mongo
+from backend.helpers import get_sha1_hash
 
 
 class Users:
@@ -21,6 +18,12 @@ class Users:
     def get_by_access_token(cls, access_token):
         return mongo.db[cls.collection_name].find_one({
             'access_token': access_token
+        })
+
+    @classmethod
+    def get_by_mongo_id(cls, id):
+        return mongo.db[cls.collection_name].find_one({
+            '_id': id
         })
 
     @classmethod

@@ -1,7 +1,8 @@
 import React from 'react';
 import {Router, Route} from 'react-router';
 import {createBrowserHistory} from 'history';
-import MainScreen from './components/screens/Main';
+import EditScreen from './components/screens/Edit';
+import ReadScreen from './components/screens/Read';
 import {withStyles} from '@material-ui/core';
 
 const history = createBrowserHistory();
@@ -9,7 +10,11 @@ const history = createBrowserHistory();
 function App() {
   return (
     <Router history={history}>
-      <Route path="/" component={MainScreen} />
+      <>
+        <Route exact path="/" component={EditScreen} />
+        <Route path="/edit/:textId" component={EditScreen} />
+        <Route path="/read/:textId" component={ReadScreen} />
+      </>
     </Router>
   );
 }

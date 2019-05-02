@@ -1,6 +1,6 @@
 from flask import request
 
-from backend.services.database import mongo
+from backend.mongo import mongo
 from backend.users import users
 from backend.users.models import Users
 from backend.helpers import (
@@ -8,7 +8,7 @@ from backend.helpers import (
     jsonify_ok,
 )
 from backend.users.helpers import (
-    is_auth_allowed,
+    validate_user_information,
     set_cookie_access_token
 )
 
@@ -24,7 +24,7 @@ def login():
     if not service or not identifier:
         return jsonify_error(error_type='MISSING_REQUIRED_PARAMS')
 
-    if not is_auth_allowed(service, identifier, id_token):
+    if not validate_user_information(service, identifier, id_token):
         return jsonify_error(error_type='ACCESS_DENIED')
 
     user_document = Users.get_by_service_and_identifier(
@@ -35,12 +35,10 @@ def login():
     if not user_document:
         result = Users.create(service, identifier)
         inserted_id = result.inserted_id
-        user_document = mongo.db[Users.collection_name].find_one({
-            '_id': inserted_id
-        })
+        user_document = Users.get_by_mongo_id(inserted_id)
 
     user_id = str(user_document['_id'])
     access_token = user_document['access_token']
 
-    resp = jsonify_ok(data={'userId': user_id})
-    return set_cookie_access_token(resp, access_token)
+    response = jsonify_ok(data={'userId': user_id})
+    return set_cookie_access_token(response, access_token)
