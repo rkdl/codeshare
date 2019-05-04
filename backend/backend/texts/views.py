@@ -60,6 +60,12 @@ def read_all():
         data=prepare_text_document_structure(result)
     )
 
+@texts.route('/random', methods=['POST'])
+def get_random():
+    request_params = request.get_json(force=True)
+    will_expire = request_params.get('will_expire')
+
+    return jsonify_ok(Texts.get_random(will_expire))
 
 
 @texts.route('/read', methods=['POST'])

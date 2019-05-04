@@ -1,7 +1,7 @@
 from backend.helpers import get_sha1_hash
 from backend.mongo import mongo
 from datetime import datetime
-
+import random
 
 class Texts:
     collection_name = 'texts'
@@ -11,6 +11,25 @@ class Texts:
         return mongo.db[cls.collection_name].find_one({
             '_id': id
         })
+
+    @classmethod
+    def get_random(cls, will_expired):
+        all = mongo.db[cls.collection_name].find()
+        # all = [{'name':'lol', 'expire_time': datetime.today()},
+        #         {'name':'kek', 'expire_time': None },
+        #        {'name':'cheburek', 'expire_time': datetime.today()},
+        #        {'name':'memasi', 'expire_time': None}]
+
+        random.shuffle(all)
+
+        for x in all:
+            if will_expired == "True":
+                if x['expire_time']:
+                    if x['expire_time'] >= datetime.now():
+                        return x
+            else:
+                if not x['expire_time']:
+                    return x
 
     @classmethod
     def get_by_identifier(cls, identifier):
