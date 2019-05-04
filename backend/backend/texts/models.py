@@ -19,6 +19,12 @@ class Texts:
         })
 
     @classmethod
+    def get_all(cls, user_identifier):
+        return mongo.db[cls.collection_name].find({
+            'user_identifier': user_identifier
+        })
+
+    @classmethod
     def create(cls, text, language, expire_time, user_identifier):
         return mongo.db[cls.collection_name].insert_one({
             'identifier': get_sha1_hash(

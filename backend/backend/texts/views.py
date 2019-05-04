@@ -1,5 +1,5 @@
 from flask import request
-
+from datetime import datetime
 from backend.mongo import mongo
 from backend.texts import texts
 from backend.texts.models import Texts
@@ -39,6 +39,29 @@ def create():
     })
 
 
+@texts.route('/all', methods=['POST'])
+def read_all():
+    access_token = request.cookies.get('access_token')
+    user_identifier = None
+    if access_token:
+        user_document = Users.get_by_access_token(access_token)
+        if not user_document:
+            return jsonify_error(error_type='USER_NOT_FOUND')
+
+        user_identifier = user_document['identifier']
+
+    all_texts = Texts.get_all(user_identifier)
+    result = None
+    for text in all_texts:
+        if text['expire_time'] > datetime.now():
+            result.append(text)
+
+    return jsonify_ok(
+        data=prepare_text_document_structure(result)
+    )
+
+
+
 @texts.route('/read', methods=['POST'])
 def read():
     request_params = request.get_json(force=True)
@@ -47,13 +70,16 @@ def read():
         return jsonify_error(error_type='MISSING_REQUIRED_PARAMS')
 
     text_document = Texts.get_by_identifier(identifier)
+
+    if text_document['expire_time'] < datetime.now():
+        return jsonify_error(error_type='TEXT_IS_EXPIRED')
+
     if not text_document:
         return jsonify_error(error_type='TEXT_NOT_FOUND')
 
     return jsonify_ok(
         data=prepare_text_document_structure(text_document)
     )
-
 
 @texts.route('/update', methods=['POST'])
 def update():
@@ -68,8 +94,13 @@ def update():
         return jsonify_error(error_type='MISSING_REQUIRED_PARAMS')
 
     text_document = Texts.get_by_identifier(identifier)
+
     if not text_document:
         return jsonify_error(error_type='TEXT_NOT_FOUND')
+
+
+    if text_document['expire_time'] < datetime.now():
+        return jsonify_error(error_type='TEXT_IS_EXPIRED')
 
     if text_document['user_identifier']:
         access_token = request.cookies.get('access_token')
