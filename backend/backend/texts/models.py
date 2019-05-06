@@ -1,7 +1,7 @@
 from backend.helpers import get_sha1_hash
 from backend.mongo import mongo
 from datetime import datetime
-import random
+from random import shuffle
 
 class Texts:
     collection_name = 'texts'
@@ -13,23 +13,23 @@ class Texts:
         })
 
     @classmethod
-    def get_random(cls, will_expired):
-        all = mongo.db[cls.collection_name].find()
-        # all = [{'name':'lol', 'expire_time': datetime.today()},
-        #         {'name':'kek', 'expire_time': None },
-        #        {'name':'cheburek', 'expire_time': datetime.today()},
-        #        {'name':'memasi', 'expire_time': None}]
+    def get_random(cls, will_expire):
+        all_texts = mongo.db[cls.collection_name].find()
 
-        random.shuffle(all)
+        shuffle(all_texts)
 
-        for x in all:
-            if will_expired == "True":
-                if x['expire_time']:
-                    if x['expire_time'] >= datetime.now():
-                        return x
+        for text_document in all_texts:
+            if will_expire:
+                if text_document['expire_time']:
+                    if text_document['expire_time'] >= datetime.now():
+                        return text_document
             else:
-                if not x['expire_time']:
-                    return x
+                if not text_document['expire_time']:
+                    return text_document
+        
+        return None
+
+ 
 
     @classmethod
     def get_by_identifier(cls, identifier):
@@ -38,7 +38,7 @@ class Texts:
         })
 
     @classmethod
-    def get_all(cls, user_identifier):
+    def get_all_by_user_itentifier(cls, user_identifier):
         return mongo.db[cls.collection_name].find({
             'user_identifier': user_identifier
         })

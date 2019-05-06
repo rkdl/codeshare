@@ -39,8 +39,8 @@ def create():
     })
 
 
-@texts.route('/all', methods=['POST'])
-def read_all():
+@texts.route('/get_all', methods=['POST'])
+def get_all():
     access_token = request.cookies.get('access_token')
     user_identifier = None
     if access_token:
@@ -50,22 +50,35 @@ def read_all():
 
         user_identifier = user_document['identifier']
 
-    all_texts = Texts.get_all(user_identifier)
-    result = None
-    for text in all_texts:
-        if text['expire_time'] > datetime.now():
-            result.append(text)
+    if not user_identifier:
+        return jsonify_error(error_type='ACCESS_DENIED')
 
-    return jsonify_ok(
-        data=prepare_text_document_structure(result)
-    )
+    all_texts = Texts.get_all_by_user_itentifier(user_identifier)
+    
+    result = list()
+    for text_document in all_texts:
+        result.append(
+            prepare_text_document_structure(text_document)
+        )
+
+    return jsonify_ok(data=result)
 
 @texts.route('/random', methods=['POST'])
 def get_random():
     request_params = request.get_json(force=True)
-    will_expire = request_params.get('will_expire')
+    will_expire = request_params.get('willExpire')
 
-    return jsonify_ok(Texts.get_random(will_expire))
+    if not will_expire:
+        return jsonify_error(error_type='MISSING_REQUIRED_PARAM')
+
+    if type(will_expire) is not bool:
+        return jsonify_error(error_type='EXPIRE_TIME_IS_NOT_BOOL')
+    
+    text_document = Texts.get_random(will_expire)
+
+    return jsonify_ok(
+        prepare_text_document_structure(text_document)
+    )
 
 
 @texts.route('/read', methods=['POST'])
