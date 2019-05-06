@@ -1,7 +1,7 @@
 from backend.helpers import get_sha1_hash
 from backend.mongo import mongo
 from datetime import datetime
-from random import shuffle
+from random import sample
 
 class Texts:
     collection_name = 'texts'
@@ -13,21 +13,15 @@ class Texts:
         })
 
     @classmethod
-    def get_random(cls, will_expire):
+    def get_random(cls, expire_time):
         all_texts = mongo.db[cls.collection_name].find()
 
-        shuffle(all_texts)
+        filter_text_documents = lambda text_document: \
+            text_document['expire_time'] >= datetime.now() \
+                and (expire_time or text_document['expire_time'] <= expire_time)
 
-        for text_document in all_texts:
-            if will_expire:
-                if text_document['expire_time']:
-                    if text_document['expire_time'] >= datetime.now():
-                        return text_document
-            else:
-                if not text_document['expire_time']:
-                    return text_document
-        
-        return None
+        filtered_texts = list(filter(filter_text_documents, all_texts))
+        return sample(filtered_texts, 1)[0]
 
  
 

@@ -66,15 +66,9 @@ def get_all():
 @texts.route('/random', methods=['POST'])
 def get_random():
     request_params = request.get_json(force=True)
-    will_expire = request_params.get('willExpire')
-
-    if not will_expire:
-        return jsonify_error(error_type='MISSING_REQUIRED_PARAM')
-
-    if type(will_expire) is not bool:
-        return jsonify_error(error_type='EXPIRE_TIME_IS_NOT_BOOL')
+    expire_time = request_params.get('expireTime')
     
-    text_document = Texts.get_random(will_expire)
+    text_document = Texts.get_random(expire_time)
 
     return jsonify_ok(
         prepare_text_document_structure(text_document)
