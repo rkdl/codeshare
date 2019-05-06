@@ -11,6 +11,18 @@ from backend.helpers import (
 )
 
 
+def get_user_identifier():
+    access_token = request.cookies.get('access_token')
+    if access_token:
+        user_document = Users.get_by_access_token(access_token)
+        if not user_document:
+            raise Exception('USER_NOT_FOUND')
+        else:
+            return user_document['identifier']
+    else:
+        raise Exception("MISSING_ACCESS_TOKEN")
+
+
 @texts.route('/create', methods=['POST'])
 def create():
     request_params = request.get_json(force=True)
@@ -21,14 +33,10 @@ def create():
     if not text or not language or not expire_time:
         return jsonify_error(error_type='MISSING_REQUIRED_PARAMS')
 
-    access_token = request.cookies.get('access_token')
-    user_identifier = None
-    if access_token:
-        user_document = Users.get_by_access_token(access_token)
-        if not user_document:
-            return jsonify_error(error_type='USER_NOT_FOUND')
-
-        user_identifier = user_document['identifier']
+    try:
+        user_identifier = get_user_identifier()
+    except Exception as error:
+        return jsonify_error(error_type=error.args)
 
     result = Texts.create(text, language, expire_time, user_identifier)
     inserted_id = result.inserted_id
@@ -41,17 +49,10 @@ def create():
 
 @texts.route('/get_all', methods=['POST'])
 def get_all():
-    access_token = request.cookies.get('access_token')
-    user_identifier = None
-    if access_token:
-        user_document = Users.get_by_access_token(access_token)
-        if not user_document:
-            return jsonify_error(error_type='USER_NOT_FOUND')
-
-        user_identifier = user_document['identifier']
-
-    if not user_identifier:
-        return jsonify_error(error_type='ACCESS_DENIED')
+    try:
+        user_identifier = get_user_identifier()
+    except Exception as error:
+        return jsonify_error(error_type=error.args)
 
     all_texts = Texts.get_all_by_user_itentifier(user_identifier)
     
@@ -62,6 +63,7 @@ def get_all():
         )
 
     return jsonify_ok(data=result)
+
 
 @texts.route('/random', methods=['POST'])
 def get_random():
@@ -74,24 +76,25 @@ def get_random():
         prepare_text_document_structure(text_document)
     )
 
+
 @texts.route('/statistics', methods=['POST'])
 def get_statictics():
-    request_params = request.get_json(force=True)
-    identifier = request_params.get('identifier')
-    if not identifier:
-        return jsonify_error(error_type="MISSING_REQUIRED_PARAMS")
+    try:
+        user_identifier = get_user_identifier()
+    except Exception as error:
+        return jsonify_error(error_type=error.args)
 
-    return jsonify_ok(data= Texts.get_statistics_by_user(identifier))
+    return jsonify_ok(data=Texts.get_statistics_by_user(user_identifier))
 
 
 @texts.route('/read', methods=['POST'])
 def read():
-    request_params = request.get_json(force=True)
-    identifier = request_params.get('identifier')
-    if not identifier:
-        return jsonify_error(error_type='MISSING_REQUIRED_PARAMS')
+    try:
+        user_identifier = get_user_identifier()
+    except Exception as error:
+        return jsonify_error(error_type=error.args)
 
-    text_document = Texts.get_by_identifier(identifier)
+    text_document = Texts.get_by_identifier(user_identifier)
 
     if text_document['expire_time'] < datetime.now():
         return jsonify_error(error_type='TEXT_IS_EXPIRED')
@@ -102,6 +105,7 @@ def read():
     return jsonify_ok(
         data=prepare_text_document_structure(text_document)
     )
+
 
 @texts.route('/update', methods=['POST'])
 def update():
@@ -120,17 +124,14 @@ def update():
     if not text_document:
         return jsonify_error(error_type='TEXT_NOT_FOUND')
 
-
     if text_document['expire_time'] < datetime.now():
         return jsonify_error(error_type='TEXT_IS_EXPIRED')
 
     if text_document['user_identifier']:
-        access_token = request.cookies.get('access_token')
-        user_document = Users.get_by_access_token(access_token)
-        if not user_document:
-            return jsonify_error(error_type='USER_NOT_FOUND')
-
-        user_identifier = user_document['identifier']
+        try:
+            user_identifier = get_user_identifier()
+        except Exception as error:
+            return jsonify_error(error_type=error.args)
         if text_document['user_identifier'] != user_identifier:
             return jsonify_error(error_type='ACCESS_DENIED')
 
@@ -154,12 +155,11 @@ def delete():
         return jsonify_error(error_type='TEXT_NOT_FOUND')
 
     if text_document['user_identifier']:
-        access_token = request.cookies.get('access_token')
-        user_document = Users.get_by_access_token(access_token)
-        if not user_document:
-            return jsonify_error(error_type='USER_NOT_FOUND')
-
-        user_identifier = user_document['identifier']
+        try:
+            user_identifier = get_user_identifier()
+        except Exception as error:
+            return jsonify_error(error_type=error.args)
+        
         if text_document['user_identifier'] != user_identifier:
             return jsonify_error(error_type='ACCESS_DENIED')
 
