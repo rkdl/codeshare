@@ -1,6 +1,6 @@
 from backend.helpers import get_sha1_hash
 from backend.mongo import mongo
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import sample
 
 class Texts:
@@ -23,7 +23,32 @@ class Texts:
         filtered_texts = list(filter(filter_text_documents, all_texts))
         return sample(filtered_texts, 1)[0]
 
- 
+    @classmethod
+    def get_statistics_by_user(cls, user_identifier):
+        all_texts = mongo.db[cls.collection_name].find({
+            user_identifier: user_identifier
+        })
+
+        available = 0
+        expired = 0
+        expired_hour = 0
+        expired_day = 0
+        for text in all_texts:
+            if text['expire_time'] > datetime.now():
+                available += 1
+                if text['expire_time'] <= datetime.now() + timedelta(hours=1):
+                    expired_hour += 1
+                if text['expire_time'] <= datetime.now() + timedelta(days=1):
+                    expired_day += 1
+            else:
+                expired += 1
+
+        return {
+            "available": available,
+            "expired": expired,
+            "expired_hour": expired_hour,
+            "expired_day": expired_day
+        }
 
     @classmethod
     def get_by_identifier(cls, identifier):

@@ -74,6 +74,15 @@ def get_random():
         prepare_text_document_structure(text_document)
     )
 
+@texts.route('/statistics', methods=['POST'])
+def get_statictics():
+    request_params = request.get_json(force=True)
+    identifier = request_params.get('identifier')
+    if not identifier:
+        return jsonify_error(error_type="MISSING_REQUIRED_PARAMS")
+
+    return jsonify_ok(data= Texts.get_statistics_by_user(identifier))
+
 
 @texts.route('/read', methods=['POST'])
 def read():
