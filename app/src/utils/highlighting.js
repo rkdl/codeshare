@@ -17,15 +17,11 @@ const SUPPORTED_LANGUAGES_RAW = [
   'shell',
 ];
 
-const LANG_ALIASES_MAP = {
+const LANGUAGE_ALIASES_MAP = {
   cpp: 'C++',
   cs: 'C#',
 };
 
-const SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES_RAW.map(
-  lang => LANG_ALIASES_MAP[lang] || lang
-);
-
 const determineLanguage = codeFragment => highlightAuto(codeFragment).language;
 
-export {SUPPORTED_LANGUAGES_RAW, SUPPORTED_LANGUAGES, determineLanguage};
+export {SUPPORTED_LANGUAGES_RAW, LANGUAGE_ALIASES_MAP, determineLanguage};

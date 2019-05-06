@@ -8,7 +8,11 @@ import {
 } from '@material-ui/core';
 import {CodeContext} from '../../store/Code';
 import {useDebounce} from '../../utils/hooks';
-import {SUPPORTED_LANGUAGES, determineLanguage} from '../../utils/highlighting';
+import {
+    LANGUAGE_ALIASES_MAP,
+    SUPPORTED_LANGUAGES_RAW,
+    determineLanguage,
+} from '../../utils/highlighting';
 
 function Options(props) {
   const {classes} = props;
@@ -44,9 +48,9 @@ function Options(props) {
           setIsLanguageDetectionEnabled(false);
         }}
       >
-        {SUPPORTED_LANGUAGES.map(language => (
-          <MenuItem key={language} value={language.toLowerCase()}>
-            {language}
+        {SUPPORTED_LANGUAGES_RAW.map(language => (
+          <MenuItem key={language} value={language}>
+            {LANGUAGE_ALIASES_MAP[language] || language}
           </MenuItem>
         ))}
       </Select>
