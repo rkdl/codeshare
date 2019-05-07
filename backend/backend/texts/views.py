@@ -54,7 +54,7 @@ def get_all():
     except Exception as error:
         return jsonify_error(error_type=error.args)
 
-    all_texts = Texts.get_all_by_user_itentifier(user_identifier)
+    all_texts = Texts.get_all_by_user_identifier(user_identifier)
     
     result = list()
     for text_document in all_texts:
@@ -73,12 +73,12 @@ def get_random():
     text_document = Texts.get_random(expire_time)
 
     return jsonify_ok(
-        prepare_text_document_structure(text_document)
+        text_document and prepare_text_document_structure(text_document)
     )
 
 
 @texts.route('/statistics', methods=['POST'])
-def get_statictics():
+def get_statistics():
     try:
         user_identifier = get_user_identifier()
     except Exception as error:

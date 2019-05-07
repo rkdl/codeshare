@@ -1,27 +1,33 @@
+from datetime import datetime, timedelta
+
 from backend.helpers import get_sha1_hash
 from backend.mongo import mongo
-from datetime import datetime, timedelta
-from random import sample
+
 
 class Texts:
     collection_name = 'texts'
 
     @classmethod
-    def get_by_mongo_id(cls, id):
+    def get_by_mongo_id(cls, id_):
         return mongo.db[cls.collection_name].find_one({
-            '_id': id
+            '_id': id_,
         })
 
     @classmethod
     def get_random(cls, expire_time):
-        all_texts = mongo.db[cls.collection_name].find()
-
-        filter_text_documents = lambda text_document: \
-            text_document['expire_time'] >= datetime.now() \
-                and (expire_time or text_document['expire_time'] <= expire_time)
-
-        filtered_texts = list(filter(filter_text_documents, all_texts))
-        return sample(filtered_texts, 1)[0]
+        filter_non_expired = {
+            '$match': {
+                'expire_time': {
+                    '$gte': datetime.now(),
+                    **({'$lte': expire_time} if expire_time else {}),
+                },
+            },
+        }
+        raw_agg_cursor = mongo.db[cls.collection_name].aggregate([
+            filter_non_expired,
+            {'$sample': {'size': 1}},
+        ])
+        return next(raw_agg_cursor, default=None)
 
     @classmethod
     def get_statistics_by_user(cls, user_identifier):
@@ -57,7 +63,7 @@ class Texts:
         })
 
     @classmethod
-    def get_all_by_user_itentifier(cls, user_identifier):
+    def get_all_by_user_identifier(cls, user_identifier):
         return mongo.db[cls.collection_name].find({
             'user_identifier': user_identifier
         })
