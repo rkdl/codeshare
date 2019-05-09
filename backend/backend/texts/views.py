@@ -96,12 +96,12 @@ def get_statistics():
 
 @texts.route('/read', methods=['POST'])
 def read():
-    try:
-        user_identifier = get_user_identifier()
-    except Exception as error:
-        return jsonify_error(error_type=error.args)
+    request_params = request.get_json(force=True)
+    text_identifier = request_params.get('identifier')
+    if not text_identifier:
+        return jsonify_error(error_type='MISSING_REQUIRED_PARAMS')
 
-    text_document = Texts.get_by_identifier(user_identifier)
+    text_document = Texts.get_by_identifier(text_identifier)
 
     if not text_document:
         return jsonify_error(error_type='TEXT_NOT_FOUND')
