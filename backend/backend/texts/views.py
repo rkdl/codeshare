@@ -76,7 +76,9 @@ def get_random():
     request_params = request.get_json(force=True)
     expire_time = request_params.get('expireTime')
 
-    expire_datetime = datetime.strptime(expire_time, STD_DATE_FORMAT)
+    expire_datetime = (
+        expire_time and datetime.strptime(expire_time, STD_DATE_FORMAT)
+    )
     text_document = Texts.get_random(expire_datetime)
 
     return jsonify_ok(
@@ -84,14 +86,20 @@ def get_random():
     )
 
 
-@texts.route('/statistics', methods=['POST'])
-def get_statistics():
+@texts.route('/user_statistics', methods=['POST'])
+def user_statistics():
     try:
         user_identifier = get_user_identifier()
     except Exception as error:
         return jsonify_error(error_type=error.args)
 
-    return jsonify_ok(data=Texts.get_statistics_by_user(user_identifier))
+    stats = Texts.get_statistics(user_identifier)
+    return jsonify_ok(data={'textStats': stats})
+
+
+@texts.route('/total_statistics', methods=['POST'])
+def total_statistics():
+    return jsonify_ok(data={'textStats': Texts.get_statistics()})
 
 
 @texts.route('/read', methods=['POST'])

@@ -27,33 +27,61 @@ class Texts:
             filter_non_expired,
             {'$sample': {'size': 1}},
         ])
-        return next(raw_agg_cursor, default=None)
+        return next(raw_agg_cursor, None)
 
     @classmethod
-    def get_statistics_by_user(cls, user_identifier):
-        all_texts = mongo.db[cls.collection_name].find({
-            user_identifier: user_identifier
-        })
+    def get_statistics(cls, user_identifier=None):
+        current_datetime = datetime.now()
 
-        available = 0
-        expired = 0
-        expired_hour = 0
-        expired_day = 0
-        for text in all_texts:
-            if text['expire_datetime'] > datetime.now():
-                available += 1
-                if text['expire_datetime'] <= datetime.now() + timedelta(hours=1):
-                    expired_hour += 1
-                if text['expire_datetime'] <= datetime.now() + timedelta(days=1):
-                    expired_day += 1
-            else:
-                expired += 1
+        stats_counters_agg = {
+            '$facet': {
+                'available': [
+                    {'$match': {'expire_datetime': {'$gt': current_datetime}}},
+                    {'$count': 'available'},
+                ],
+                'expired': [
+                    {'$match': {'expire_datetime': {'$lte': current_datetime}}},
+                    {'$count': 'expired'},
+                ],
+                'expire_in_one_day': [
+                    {
+                        '$match': {
+                            'expire_datetime': {
+                                '$gt': current_datetime,
+                                '$lte': current_datetime + timedelta(days=1),
+                            },
+                        },
+                    },
+                    {'$count': 'expire_in_one_day'},
+                ],
+                'expire_in_one_hour': [
+                    {
+                        '$match': {
+                            'expire_datetime': {
+                                '$gt': current_datetime,
+                                '$lte': current_datetime + timedelta(hours=1),
+                            },
+                        },
+                    },
+                    {'$count': 'expire_in_one_hour'},
+                ],
+            }
+        }
 
+        pipeline = []
+        if user_identifier:
+            pipeline.append({'$match': {'user_identifier': user_identifier}})
+        pipeline.append(stats_counters_agg)
+
+        agg_result = next(mongo.db[cls.collection_name].aggregate(pipeline))
         return {
-            "available": available,
-            "expired": expired,
-            "expired_hour": expired_hour,
-            "expired_day": expired_day
+            field: agg_result[field][0][field] if agg_result[field] else 0
+            for field in [
+                'available',
+                'expired',
+                'expire_in_one_day',
+                'expire_in_one_hour',
+            ]
         }
 
     @classmethod
