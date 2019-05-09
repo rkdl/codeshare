@@ -1,10 +1,14 @@
-from flask import request
 from datetime import datetime
-from backend.mongo import mongo
+
+from flask import request
+
 from backend.texts import texts
 from backend.texts.models import Texts
 from backend.users.models import Users
-from backend.texts.helpers import prepare_text_document_structure
+from backend.texts.helpers import (
+    STD_DATE_FORMAT,
+    prepare_text_document_structure,
+)
 from backend.helpers import (
     jsonify_error,
     jsonify_ok,
@@ -33,12 +37,14 @@ def create():
     if not text or not language or not expire_time:
         return jsonify_error(error_type='MISSING_REQUIRED_PARAMS')
 
+    expire_datetime = datetime.strptime(expire_time, STD_DATE_FORMAT)
+
     try:
         user_identifier = get_user_identifier()
     except Exception as error:
         return jsonify_error(error_type=error.args)
 
-    result = Texts.create(text, language, expire_time, user_identifier)
+    result = Texts.create(text, language, expire_datetime, user_identifier)
     inserted_id = result.inserted_id
     text_document = Texts.get_by_mongo_id(inserted_id)
 
@@ -69,8 +75,9 @@ def get_all():
 def get_random():
     request_params = request.get_json(force=True)
     expire_time = request_params.get('expireTime')
-    
-    text_document = Texts.get_random(expire_time)
+
+    expire_datetime = datetime.strptime(expire_time, STD_DATE_FORMAT)
+    text_document = Texts.get_random(expire_datetime)
 
     return jsonify_ok(
         text_document and prepare_text_document_structure(text_document)
@@ -96,11 +103,10 @@ def read():
 
     text_document = Texts.get_by_identifier(user_identifier)
 
-    if text_document['expire_time'] < datetime.now():
-        return jsonify_error(error_type='TEXT_IS_EXPIRED')
-
     if not text_document:
         return jsonify_error(error_type='TEXT_NOT_FOUND')
+    if text_document['expire_datetime'] < datetime.now():
+        return jsonify_error(error_type='TEXT_IS_EXPIRED')
 
     return jsonify_ok(
         data=prepare_text_document_structure(text_document)
@@ -124,7 +130,7 @@ def update():
     if not text_document:
         return jsonify_error(error_type='TEXT_NOT_FOUND')
 
-    if text_document['expire_time'] < datetime.now():
+    if text_document['expire_datetime'] < datetime.now():
         return jsonify_error(error_type='TEXT_IS_EXPIRED')
 
     if text_document['user_identifier']:
@@ -135,9 +141,10 @@ def update():
         if text_document['user_identifier'] != user_identifier:
             return jsonify_error(error_type='ACCESS_DENIED')
 
+    expire_datetime = datetime.strptime(expire_time, STD_DATE_FORMAT)
     text_document['text'] = text
     text_document['language'] = language
-    text_document['expire_time'] = expire_time
+    text_document['expire_datetime'] = expire_datetime
     Texts.update(
         {'identifier': text_document['identifier']},
         text_document
