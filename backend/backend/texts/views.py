@@ -12,6 +12,7 @@ from backend.texts.helpers import (
 from backend.helpers import (
     jsonify_error,
     jsonify_ok,
+    snake_to_camelcase_strategy,
 )
 
 
@@ -72,7 +73,7 @@ def get_all():
 
 
 @texts.route('/random', methods=['POST'])
-def get_random():
+def random():
     request_params = request.get_json(force=True)
     expire_time = request_params.get('expireTime')
 
@@ -94,12 +95,14 @@ def user_statistics():
         return jsonify_error(error_type=error.args)
 
     stats = Texts.get_statistics(user_identifier)
-    return jsonify_ok(data={'textStats': stats})
+    return jsonify_ok(data={'textStats': snake_to_camelcase_strategy(stats)})
 
 
 @texts.route('/total_statistics', methods=['POST'])
 def total_statistics():
-    return jsonify_ok(data={'textStats': Texts.get_statistics()})
+    return jsonify_ok(data={
+        'textStats': snake_to_camelcase_strategy(Texts.get_statistics())
+    })
 
 
 @texts.route('/read', methods=['POST'])
