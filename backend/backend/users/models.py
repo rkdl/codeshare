@@ -1,5 +1,3 @@
-from hashlib import sha1
-
 from backend.mongo import mongo
 from backend.helpers import get_sha1_hash
 

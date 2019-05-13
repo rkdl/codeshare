@@ -12,10 +12,9 @@ RUN apt-get update && \
 WORKDIR /app
 ENV HOME /app
 
+COPY runserver.py Pipfile Pipfile.lock ./
+
 COPY config config
-COPY Pipfile Pipfile.lock ./
 
-RUN pip install pipenv
-RUN pipenv install --system --deploy
-
-COPY runserver.py runserver.py
+RUN pip install --no-cache-dir pipenv && \
+    pipenv install --system --deploy --ignore-pipfile

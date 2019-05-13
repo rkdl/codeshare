@@ -1,53 +1,87 @@
+from datetime import datetime, timedelta
+
 from backend.helpers import get_sha1_hash
 from backend.mongo import mongo
-from datetime import datetime, timedelta
-from random import sample
+
 
 class Texts:
     collection_name = 'texts'
 
     @classmethod
-    def get_by_mongo_id(cls, id):
+    def get_by_mongo_id(cls, id_):
         return mongo.db[cls.collection_name].find_one({
-            '_id': id
+            '_id': id_,
         })
 
     @classmethod
-    def get_random(cls, expire_time):
-        all_texts = mongo.db[cls.collection_name].find()
-
-        filter_text_documents = lambda text_document: \
-            text_document['expire_time'] >= datetime.now() \
-                and (expire_time or text_document['expire_time'] <= expire_time)
-
-        filtered_texts = list(filter(filter_text_documents, all_texts))
-        return sample(filtered_texts, 1)[0]
+    def get_random(cls, expire_datetime=None):
+        filter_non_expired = {
+            '$match': {
+                'expire_datetime': {
+                    '$gte': datetime.now(),
+                    **({'$lte': expire_datetime} if expire_datetime else {}),
+                },
+            },
+        }
+        raw_agg_cursor = mongo.db[cls.collection_name].aggregate([
+            filter_non_expired,
+            {'$sample': {'size': 1}},
+        ])
+        return next(raw_agg_cursor, None)
 
     @classmethod
-    def get_statistics_by_user(cls, user_identifier):
-        all_texts = mongo.db[cls.collection_name].find({
-            user_identifier: user_identifier
-        })
+    def get_statistics(cls, user_identifier=None):
+        current_datetime = datetime.now()
 
-        available = 0
-        expired = 0
-        expired_hour = 0
-        expired_day = 0
-        for text in all_texts:
-            if text['expire_time'] > datetime.now():
-                available += 1
-                if text['expire_time'] <= datetime.now() + timedelta(hours=1):
-                    expired_hour += 1
-                if text['expire_time'] <= datetime.now() + timedelta(days=1):
-                    expired_day += 1
-            else:
-                expired += 1
+        stats_counters_agg = {
+            '$facet': {
+                'available': [
+                    {'$match': {'expire_datetime': {'$gt': current_datetime}}},
+                    {'$count': 'available'},
+                ],
+                'expired': [
+                    {'$match': {'expire_datetime': {'$lte': current_datetime}}},
+                    {'$count': 'expired'},
+                ],
+                'expire_in_one_day': [
+                    {
+                        '$match': {
+                            'expire_datetime': {
+                                '$gt': current_datetime,
+                                '$lte': current_datetime + timedelta(days=1),
+                            },
+                        },
+                    },
+                    {'$count': 'expire_in_one_day'},
+                ],
+                'expire_in_one_hour': [
+                    {
+                        '$match': {
+                            'expire_datetime': {
+                                '$gt': current_datetime,
+                                '$lte': current_datetime + timedelta(hours=1),
+                            },
+                        },
+                    },
+                    {'$count': 'expire_in_one_hour'},
+                ],
+            }
+        }
 
+        pipeline = []
+        if user_identifier:
+            pipeline.append({'$match': {'user_identifier': user_identifier}})
+        pipeline.append(stats_counters_agg)
+
+        agg_result = next(mongo.db[cls.collection_name].aggregate(pipeline))
         return {
-            "available": available,
-            "expired": expired,
-            "expired_hour": expired_hour,
-            "expired_day": expired_day
+            field: agg_result[field][0][field] if agg_result[field] else 0
+            for field in [
+                'available',
+                'expired',
+                'expire_in_one_day',
+                'expire_in_one_hour',
+            ]
         }
 
     @classmethod
@@ -57,20 +91,22 @@ class Texts:
         })
 
     @classmethod
-    def get_all_by_user_itentifier(cls, user_identifier):
+    def get_all_by_user_identifier(cls, user_identifier):
         return mongo.db[cls.collection_name].find({
             'user_identifier': user_identifier
         })
 
     @classmethod
-    def create(cls, text, language, expire_time, user_identifier):
+    def create(cls, text, language, expire_datetime, user_identifier):
+        assert isinstance(expire_datetime, datetime), 'don\'t mess with dates'
+
         return mongo.db[cls.collection_name].insert_one({
             'identifier': get_sha1_hash(
                 text + str(user_identifier) + str(datetime.now())
             )[0:10],
             'text': text,
             'language': language,
-            'expire_time': expire_time,
+            'expire_datetime': expire_datetime,
             'user_identifier': user_identifier,
         })
 
