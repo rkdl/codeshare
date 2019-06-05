@@ -43,6 +43,7 @@ function CodeContextProvider(props) {
   const [expireTime, setExpireTime] = React.useState(null);
   const [userIdentifier, setUserIdentifier] = React.useState(null);
   const [isFetched, setIsFetched] = React.useState(false);
+  const [isExpired, setIsExpired] = React.useState(false);
 
   const textLinesCount = [...text].reduce(
     (count, char) => (char === '\n' ? count + 1 : count),
@@ -54,7 +55,7 @@ function CodeContextProvider(props) {
       await updateTextAPI({
         text,
         language,
-        expireTime: '10-10-2010',
+        expireTime: '10-10-2019',
         identifier,
       });
     } else {
@@ -63,7 +64,7 @@ function CodeContextProvider(props) {
       } = await createTextAPI({
         text,
         language,
-        expireTime: '10-10-2010',
+        expireTime: '10-10-2019',
         identifier,
       });
 
@@ -73,21 +74,28 @@ function CodeContextProvider(props) {
   };
 
   const fetchText = async id => {
-    const {
-      data: {
-        text: newText,
-        language: newLanguage,
-        expireTime: newExpireTime,
-        userIdentifier: newUserIdentifier,
-      },
-    } = await readTextAPI({
+    const response = await readTextAPI({
       identifier: id || identifier,
     });
-
-    setText(newText);
-    setLanguage(newLanguage);
-    setExpireTime(newExpireTime);
-    setUserIdentifier(String(newUserIdentifier));
+    console.log(response.data !== undefined)
+    if(response.data !== undefined){
+      const {
+        data: {
+          text: newText,
+          language: newLanguage,
+          expireTime: newExpireTime,
+          userIdentifier: newUserIdentifier,
+        },
+      } = response;
+  
+      setText(newText);
+      setLanguage(newLanguage);
+      setExpireTime(newExpireTime);
+      setUserIdentifier(String(newUserIdentifier));
+    }
+    else{
+      setIsExpired(true)
+    }
     setIsFetched(true);
   };
 
@@ -107,6 +115,7 @@ function CodeContextProvider(props) {
         fetchText,
         userIdentifier,
         isFetched,
+        isExpired
       }}
     >
       {props.children}
