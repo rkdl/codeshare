@@ -9,8 +9,8 @@ services:
       - 5000
     command: [
       'uwsgi',
-      '--http", "0.0.0.0:5000',
-      '--wsgi-file", 'runserver.py',
+      '--http', '0.0.0.0:5000',
+      '--wsgi-file', 'runserver.py',
       '--callable', 'app',
       '--catch-exceptions',
       '--processes', '1'
