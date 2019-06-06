@@ -1,6 +1,6 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
-import {getDateNDaysFromNow} from '../utils/helpers';
+import {getDateNDaysFromNow, formatDate} from '../utils/helpers';
 
 const CodeContext = React.createContext();
 
@@ -53,19 +53,11 @@ function CodeContextProvider(props) {
   );
 
   const saveText = async () => {
-    const expireTimeFormatted = (
-      expireTime.getDate() 
-      + '-' 
-      + (expireTime.getMonth() + 1) 
-      + '-' 
-      + expireTime.getFullYear()
-    );
-
     if (identifier) {
       await updateTextAPI({
         text,
         language,
-        expireTime: expireTimeFormatted,
+        expireTime: formatDate(expireTime),
         identifier,
       });
     } else {
@@ -74,7 +66,7 @@ function CodeContextProvider(props) {
       } = await createTextAPI({
         text,
         language,
-        expireTime: expireTimeFormatted,
+        expireTime: formatDate(expireTime),
         identifier,
       });
 
@@ -107,7 +99,7 @@ function CodeContextProvider(props) {
   
       setText(newText);
       setLanguage(newLanguage);
-      setExpireTime(newExpireTime);
+      setExpireTime(new Date(newExpireTime));
       setUserIdentifier(String(newUserIdentifier));
       setIsFetched(true);
 
