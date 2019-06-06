@@ -1,5 +1,6 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
+import {getDateNDaysFromNow} from '../utils/helpers';
 
 const CodeContext = React.createContext();
 
@@ -40,7 +41,9 @@ function CodeContextProvider(props) {
   const [language, setLanguage] = React.useState('javascript');
   const [text, setText] = React.useState('');
   const [identifier, setIdentifier] = React.useState(null);
-  const [expireTime, setExpireTime] = React.useState(null);
+
+  // TODO: create control to set expire time
+  const [expireTime, setExpireTime] = React.useState(getDateNDaysFromNow(2));
   const [userIdentifier, setUserIdentifier] = React.useState(null);
   const [isFetched, setIsFetched] = React.useState(false);
 
@@ -50,11 +53,19 @@ function CodeContextProvider(props) {
   );
 
   const saveText = async () => {
+    const expireTimeFormatted = (
+      expireTime.getDate() 
+      + '-' 
+      + (expireTime.getMonth() + 1) 
+      + '-' 
+      + expireTime.getFullYear()
+    );
+
     if (identifier) {
       await updateTextAPI({
         text,
         language,
-        expireTime: '10-10-2010',
+        expireTime: expireTimeFormatted,
         identifier,
       });
     } else {
@@ -63,7 +74,7 @@ function CodeContextProvider(props) {
       } = await createTextAPI({
         text,
         language,
-        expireTime: '10-10-2010',
+        expireTime: expireTimeFormatted,
         identifier,
       });
 
@@ -73,22 +84,33 @@ function CodeContextProvider(props) {
   };
 
   const fetchText = async id => {
-    const {
-      data: {
+      const {
+        data,
+        errorType,
+      } = await readTextAPI({
+        identifier: id,
+      });
+
+      if (errorType && errorType === 'TEXT_IS_EXPIRED'){
+        setIsFetched(false);
+        alert('text is expired');
+        window.location.replace('/');
+        return;
+      }
+
+      const {
         text: newText,
         language: newLanguage,
         expireTime: newExpireTime,
         userIdentifier: newUserIdentifier,
-      },
-    } = await readTextAPI({
-      identifier: id || identifier,
-    });
+      } = data;
+  
+      setText(newText);
+      setLanguage(newLanguage);
+      setExpireTime(newExpireTime);
+      setUserIdentifier(String(newUserIdentifier));
+      setIsFetched(true);
 
-    setText(newText);
-    setLanguage(newLanguage);
-    setExpireTime(newExpireTime);
-    setUserIdentifier(String(newUserIdentifier));
-    setIsFetched(true);
   };
 
   return (

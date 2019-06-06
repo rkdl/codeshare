@@ -17,3 +17,6 @@ export const copyToClipboard = str => {
     document.getSelection().addRange(selected);
   }
 };
+
+export const getDateNDaysFromNow = n =>
+  new Date(Date.now() + n * 24 * 60 * 60 * 1000);
