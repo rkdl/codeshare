@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^3.0.2",
+    "@material-ui/pickers": "^3.1.0",
     "firebase": "^5.8.4",
     "highlight.js": "^9.15.6",
     "history": "^4.7.2",

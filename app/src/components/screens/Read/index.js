@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from '../../Header';
+import Footer from '../../Footer';
 import Editor from '../../Editor';
 import { Typography, withStyles, Modal, DialogContent } from '@material-ui/core';
 import { CodeContext } from '../../../store/Code';
@@ -54,6 +55,7 @@ function ReadScreen(props) {
           </DialogContent>
         </Modal>
       }
+      <Footer />
     </>
   );
 }

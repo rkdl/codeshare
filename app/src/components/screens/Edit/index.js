@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../../Header';
 import Editor from '../../Editor';
 import Options from '../../Options';
+import Footer from '../../Footer';
 import { withStyles, Button, Modal, Typography, DialogContent } from '@material-ui/core';
 import { CodeContext } from '../../../store/Code';
 import { UserContext } from '../../../store/User';
@@ -50,7 +51,7 @@ function EditScreen(props) {
             <Button
               variant="contained"
               color="primary"
-              onClick={codeContext.saveText}
+              onClick={() => codeContext.saveText()}
             >
               {codeContext.identifier ? 'save' : 'Save and get sharable link'}
             </Button>
@@ -69,6 +70,7 @@ function EditScreen(props) {
           </div>
         </div>
         <Editor className={classes.editor} edit={true} />
+        <Footer />
       </>
       :
       <Modal open={codeContext.isExpired}>

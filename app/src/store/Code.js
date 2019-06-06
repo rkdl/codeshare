@@ -44,6 +44,8 @@ function CodeContextProvider(props) {
   const [userIdentifier, setUserIdentifier] = React.useState(null);
   const [isFetched, setIsFetched] = React.useState(false);
   const [isExpired, setIsExpired] = React.useState(false);
+  const [totalStatistic, setTotalStatistic] = React.useState({});
+
 
   const textLinesCount = [...text].reduce(
     (count, char) => (char === '\n' ? count + 1 : count),
@@ -99,6 +101,20 @@ function CodeContextProvider(props) {
     setIsFetched(true);
   };
 
+  const getTotalStatistics = async () => {
+    const response =  await fetch('/api/texts/total_statistics', {
+      method: 'POST',
+      body: JSON.stringify(),
+      headers: {
+        'Content-type': 'application/json',
+      },
+      credentials: 'include',
+    }).then(resp => resp.json());
+    let result = Object.entries(response.data.textStats)
+    result = result.map((item)=>[item[0].replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }),item[1]]);
+    setTotalStatistic(result);
+  }
+
   return (
     <CodeContext.Provider
       value={{
@@ -115,7 +131,9 @@ function CodeContextProvider(props) {
         fetchText,
         userIdentifier,
         isFetched,
-        isExpired
+        isExpired,
+        getTotalStatistics,
+        totalStatistic
       }}
     >
       {props.children}
