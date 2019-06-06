@@ -6,7 +6,7 @@ import {CodeContext} from '../../store/Code';
 const MIN_LINES_OF_CODE = 10;
 
 function Editor(props) {
-  const {classes, className, theme} = props;
+  const {classes, className, theme, expired} = props;
 
   const codeContext = React.useContext(CodeContext);
 
@@ -27,6 +27,7 @@ function Editor(props) {
   return (
     <Card className={`${classes.root} ${className}`}>
       <div className={classes.editorContainer}>
+        {expired ? <h1> Expired </h1> : null}
         <div>
           {[...Array(count).keys()].map(value => (
             <Typography key={value} className={classes.countNumber}>

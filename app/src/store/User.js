@@ -12,9 +12,35 @@ const loginUserAPI = async params => {
   }).then(resp => resp.json());
 };
 
+const getStatistics = async () => {
+  return await fetch('/api/texts/user_statistics', {
+    method: 'POST',
+    body: JSON.stringify(),
+    headers: {
+      'Content-type': 'application/json',
+    },
+    credentials: 'include',
+  }).then(resp => resp.json());
+}
+
+const getAllSnippets = async () => {
+  return await fetch('/api/texts/get_all', {
+    method: 'POST',
+    body: JSON.stringify(),
+    headers: {
+      'Content-type': 'application/json',
+    },
+    credentials: 'include',
+  }).then(resp => resp.json());
+}
+
 function UserContextProvider(props) {
   const [userObject, setUserObject] = React.useState(null);
   const [identifier, setIdentifier] = React.useState(null);
+  const [userStatistics, setUserStatistics] = React.useState([]);
+  const [userSnippets, setUserSnipptes] = React.useState([])
+
+
 
   const setUser = async user => {
     setUserObject(user);
@@ -32,6 +58,12 @@ function UserContextProvider(props) {
       identifier: uid,
       idToken,
     });
+    const statistcs = await getStatistics();
+    let result = Object.entries(statistcs.data.textStats)
+    result = result.map((item)=>[item[0].replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }),item[1]]); 
+    const snippets = await getAllSnippets();
+    setUserStatistics(result);    
+    setUserSnipptes(snippets.data)
   };
 
   const resetUser = () => {
@@ -46,6 +78,8 @@ function UserContextProvider(props) {
         user: userObject,
         setUser,
         resetUser,
+        userStatistics,
+        userSnippets
       }}
     >
       {props.children}
