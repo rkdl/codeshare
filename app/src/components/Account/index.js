@@ -7,7 +7,9 @@ import {
   DialogTitle,
   Typography,
   Tooltip,
+  DialogContent
 } from '@material-ui/core';
+import { withRouter } from 'react-router-dom';
 import {
   AccountCircle as AccountCircleIcon,
   ExitToApp as ExitToAppIcon,
@@ -19,6 +21,7 @@ const handleGoogleLoginButtonClick = async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
   await firebase.auth().signInWithPopup(provider);
+  
 };
 
 const handleFacebookLoginButtonClick = async () => {
@@ -35,6 +38,7 @@ function Account(props) {
   const isLoggedIn = Boolean(userContext.user);
 
   const [isOpen, setIsOpen] = React.useState(false);
+  const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   const handleButtonClick = () => {
     if (isLoggedIn) {
@@ -78,7 +82,7 @@ function Account(props) {
         </Button>
       </Dialog>
       <div className={classes.root}>
-        <Typography color="inherit">
+        <Typography color="inherit" onClick={()=> setModalIsOpen(true)}>
           {isLoggedIn && userContext.user.displayName}
         </Typography>
         <Tooltip title={isLoggedIn ? 'Log out' : 'Log in'}>
@@ -87,6 +91,29 @@ function Account(props) {
           </IconButton>
         </Tooltip>
       </div>
+      <Dialog open={modalIsOpen} onClose={()=> setModalIsOpen(false)}>
+        <DialogContent className={classes.dialogPaper}>
+          {
+            userContext.userStatistics !== undefined && 
+            userContext.userStatistics.length > 1 &&
+            userContext.userStatistics.map((item) => 
+              <Typography 
+                  className={classes.text} 
+                  key={item[0]}>
+                {item[0]} : {item[1]}
+              </Typography>)
+          }
+          {
+            userContext.userSnippets !== undefined && 
+            userContext.userSnippets.map((item) => 
+              <Typography 
+                className={classes.text}
+                key={item.identifier}>
+                  {item.identifier}
+              </Typography>)
+            }
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -99,10 +126,12 @@ const styles = theme => ({
   },
   dialogPaper: {
     padding: theme.spacing.unit * 2,
+    margin: theme.spacing.unit * 2,
+
   },
   button: {
     marginBottom: theme.spacing.unit,
-  },
+  }
 });
 
-export default withStyles(styles)(Account);
+export default withRouter(withStyles(styles)(Account));

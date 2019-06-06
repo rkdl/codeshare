@@ -42,45 +42,46 @@ function EditScreen(props) {
     ]);
 
   return (
-    <>{!codeContext.isExpired ?
-      <>
-        <Header />
-        <div className={classes.optionsContainer}>
-          <Options />
-          <div>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => codeContext.saveText()}
-            >
-              {codeContext.identifier ? 'save' : 'Save and get sharable link'}
-            </Button>
-            {codeContext.identifier && (
+    <>
+      {!codeContext.isExpired ?
+        <>
+          <Header />
+          <div className={classes.optionsContainer}>
+            <Options />
+            <div>
               <Button
-                onClick={() => {
-                  copyToClipboard(
-                    `${window.location.origin}/read/${codeContext.identifier}`
-                  );
-                  alert('link copied to clipboard!');
-                }}
+                variant="contained"
+                color="primary"
+                onClick={() => codeContext.saveText()}
               >
-                Copy link
-            </Button>
-            )}
+                {codeContext.identifier ? 'save' : 'Save and get sharable link'}
+              </Button>
+              {codeContext.identifier && (
+                <Button
+                  onClick={() => {
+                    copyToClipboard(
+                      `${window.location.origin}/read/${codeContext.identifier}`
+                    );
+                    alert('link copied to clipboard!');
+                  }}
+                >
+                  Copy link
+              </Button>
+              )}
+            </div>
           </div>
-        </div>
-        <Editor className={classes.editor} edit={true} />
-        <Footer />
-      </>
-      :
-      <Modal open={codeContext.isExpired}>
-        <DialogContent className={classes.paper}> 
-        <Typography variant="h6" id="modal-title">
-          Time is gone, this snippet expired
-          </Typography>
-        </DialogContent>
-      </Modal>
-    }
+          <Editor className={classes.editor} edit={true} />
+          <Footer />
+        </>
+        :
+        <Modal open={codeContext.isExpired}>
+          <DialogContent className={classes.paper}> 
+          <Typography variant="h6" id="modal-title">
+            Time is gone, this snippet expired
+            </Typography>
+          </DialogContent>
+        </Modal>
+      }
     </>
   );
 }
