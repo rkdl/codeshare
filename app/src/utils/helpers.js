@@ -17,3 +17,18 @@ export const copyToClipboard = str => {
     document.getSelection().addRange(selected);
   }
 };
+
+export const getDateNDaysFromNow = n =>
+  new Date(Date.now() + n * 24 * 60 * 60 * 1000);
+
+export const formatDate = date => (
+  date.getDate() < 10 
+    ? `0${date.getDate()}` 
+    : date.getDate()
+  ) + '-' + (
+    date.getMonth() + 1 < 10 
+      ? `0${date.getMonth() + 1}` 
+      : date.getMonth() + 1
+  ) + '-' + (
+    date.getFullYear()
+  );

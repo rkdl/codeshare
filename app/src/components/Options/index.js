@@ -5,6 +5,7 @@ import {
   Select,
   FormControlLabel,
   Switch,
+  TextField,
 } from '@material-ui/core';
 import {CodeContext} from '../../store/Code';
 import {useDebounce} from '../../utils/hooks';
@@ -66,6 +67,25 @@ function Options(props) {
           />
         }
         label="As-you-type detection"
+      />
+      <TextField
+        label="expire date"
+        type="date"
+        onChange={
+          event => codeContext.setExpireTime(new Date(event.target.value))
+        }
+        value={
+          `${
+            codeContext.expireTime.getFullYear()
+          }-${
+            codeContext.expireTime.getMonth() + 1 < 10 
+              ? `0${codeContext.expireTime.getMonth() +1}` 
+              : codeContext.expireTime.getMonth() + 1
+          }-${
+            codeContext.expireTime.getDate() < 10 
+              ? `0${codeContext.expireTime.getDate()}` 
+              : codeContext.expireTime.getDate()
+          }`}
       />
     </div>
   );

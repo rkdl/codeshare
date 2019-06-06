@@ -39,7 +39,11 @@ function ReadScreen(props) {
     <>
       <Header />
       <Typography variant="h4" className={classes.title}>
-        Code by {codeContext.userIdentifier /* TODO: show username here */}
+        Code by {
+          codeContext.userIdentifier 
+            ? 'some user' /* TODO: show user name here */ 
+            : 'anonymous'
+        }
       </Typography>
       <Editor className={classes.editor} edit={false} />
     </>
