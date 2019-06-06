@@ -1,5 +1,6 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
+import {getDateNDaysFromNow, formatDate} from '../utils/helpers';
 
 const CodeContext = React.createContext();
 
@@ -40,7 +41,9 @@ function CodeContextProvider(props) {
   const [language, setLanguage] = React.useState('javascript');
   const [text, setText] = React.useState('');
   const [identifier, setIdentifier] = React.useState(null);
-  const [expireTime, setExpireTime] = React.useState(null);
+
+  // TODO: create control to set expire time
+  const [expireTime, setExpireTime] = React.useState(getDateNDaysFromNow(2));
   const [userIdentifier, setUserIdentifier] = React.useState(null);
   const [isFetched, setIsFetched] = React.useState(false);
   const [isExpired, setIsExpired] = React.useState(false);
@@ -57,7 +60,7 @@ function CodeContextProvider(props) {
       await updateTextAPI({
         text,
         language,
-        expireTime: '10-10-2019',
+        expireTime: formatDate(expireTime),
         identifier,
       });
     } else {
@@ -66,7 +69,7 @@ function CodeContextProvider(props) {
       } = await createTextAPI({
         text,
         language,
-        expireTime: '10-10-2019',
+        expireTime: formatDate(expireTime),
         identifier,
       });
 

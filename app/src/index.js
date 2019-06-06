@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import Bootstrap from './Bootstrap';
 import UserContextProvider from './store/User';
 import CodeContextProvider from './store/Code';
-import * as serviceWorker from './serviceWorker';
 import {CssBaseline, MuiThemeProvider} from '@material-ui/core';
 import {darkTheme} from './theme';
 import hljs from 'highlight.js';
@@ -28,5 +27,3 @@ ReactDOM.render(
   </Router>,
   document.getElementById('root')
 );
-
-serviceWorker.register();

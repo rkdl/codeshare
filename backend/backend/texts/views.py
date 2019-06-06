@@ -25,7 +25,7 @@ def get_user_identifier():
         else:
             return user_document['identifier']
     else:
-        raise Exception("MISSING_ACCESS_TOKEN")
+        raise Exception('MISSING_ACCESS_TOKEN')
 
 
 @texts.route('/create', methods=['POST'])
@@ -43,7 +43,10 @@ def create():
     try:
         user_identifier = get_user_identifier()
     except Exception as error:
-        return jsonify_error(error_type=error.args)
+        if (error.args[0] != 'MISSING_ACCESS_TOKEN'):
+            return jsonify_error(error_type=error.args[0])
+        else:
+            user_identifier = None
 
     result = Texts.create(text, language, expire_datetime, user_identifier)
     inserted_id = result.inserted_id
@@ -59,7 +62,7 @@ def get_all():
     try:
         user_identifier = get_user_identifier()
     except Exception as error:
-        return jsonify_error(error_type=error.args)
+        return jsonify_error(error_type=error.args[0])
 
     all_texts = Texts.get_all_by_user_identifier(user_identifier)
     
@@ -92,7 +95,7 @@ def user_statistics():
     try:
         user_identifier = get_user_identifier()
     except Exception as error:
-        return jsonify_error(error_type=error.args)
+        return jsonify_error(error_type=error.args[0])
 
     stats = Texts.get_statistics(user_identifier)
     return jsonify_ok(data={'textStats': snake_to_camelcase_strategy(stats)})
@@ -148,7 +151,7 @@ def update():
         try:
             user_identifier = get_user_identifier()
         except Exception as error:
-            return jsonify_error(error_type=error.args)
+            return jsonify_error(error_type=error.args[0])
         if text_document['user_identifier'] != user_identifier:
             return jsonify_error(error_type='ACCESS_DENIED')
 
@@ -176,7 +179,7 @@ def delete():
         try:
             user_identifier = get_user_identifier()
         except Exception as error:
-            return jsonify_error(error_type=error.args)
+            return jsonify_error(error_type=error.args[0])
         
         if text_document['user_identifier'] != user_identifier:
             return jsonify_error(error_type='ACCESS_DENIED')
