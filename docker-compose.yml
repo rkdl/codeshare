@@ -48,7 +48,7 @@ services:
       - MONGO_LOG_DIR=/dev/null
     volumes:
       - ./database/db:/data/db
-    command: mongod --smallfiles --logpath=/dev/null
+    command: mongod --logpath=/dev/null
 
   nginx:
     image: nginx:1.13.9-alpine
